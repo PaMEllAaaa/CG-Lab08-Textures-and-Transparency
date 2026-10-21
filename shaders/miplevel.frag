@@ -9,20 +9,23 @@ layout(location = 0) in vec2 inUV;
 
 layout(location = 0) out vec4 outColor;
 
-// TODO(TASK 3a)
-// The level of detail: log2 of rho, where rho is the LONGER of the two footprint
-// sides (the length of dFdx and of dFdy of the texel position uv * u.texSize).
-// Level 0 is one texel a pixel, level 1 two, level 2 four, ...
 float lod_of(vec2 uv) {
-  return 0.0;
+  vec2 scaled_uv = uv * u.texSize;
+  vec2 dx = dFdx(scaled_uv);
+  vec2 dy = dFdy(scaled_uv);
+  float rho = max(length(dx), length(dy));
+  return log2(rho);
 }
 
-// TODO(TASK 3b)
-// The anisotropy ratio: the longer footprint side over the shorter one, clamped to
-// [1, 16] (16 is the most taps an anisotropic sampler takes). 1 means a square
-// footprint; 8 means eight texels along the long side for every one across.
 float aniso_ratio(vec2 uv) {
-  return 1.0;
+  vec2 dx = dFdx(uv) * u.texSize;
+  vec2 dy = dFdy(uv) * u.texSize;
+  float l1 = length(dx);
+  float l2 = length(dy);
+  float longer = max(l1, l2);
+  float shorter = min(l1, l2);
+  
+  return clamp(longer / shorter, 1.0, 16.0);
 }
 
 void main() {

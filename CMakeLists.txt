@@ -98,7 +98,7 @@ target_link_libraries(lab08core PUBLIC
   stb
 )
 
-target_compile_options(lab08core PUBLIC -Wall -Wextra)
+target_compile_options(lab08core PUBLIC -Wall)
 
 find_program(GLSLC NAMES glslc glslangValidator)
 

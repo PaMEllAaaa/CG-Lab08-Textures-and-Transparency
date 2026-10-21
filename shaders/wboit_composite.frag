@@ -10,11 +10,16 @@ layout(location = 0) out vec4 outColor;
 void main() {
   ivec2 p = ivec2(gl_FragCoord.xy);
 
-  // TODO(TASK 4b)
-  // Read accum (tex0) and reveal (tex1, .r) at p with texelFetch.
-  // Where nothing transparent was drawn (reveal 1), leave the scene alone. Elsewhere
-  // output the weighted average colour accum.rgb / accum.a (keep the division away
-  // from 0) with alpha 1 - reveal.
-  // Until then alpha 0: the scene stays as it is.
-  outColor = vec4(0.0);
+  vec4 accum = texelFetch(tex0, p, 0);
+  float reveal = texelFetch(tex1, p, 0).r;
+
+  // If nothing transparent was drawn (reveal is 1), leave the scene alone (alpha 0)
+  if (reveal >= 1.0) {
+    outColor = vec4(0.0);
+    return;
+  }
+
+  // Output weighted average color (preventing division by zero) and 1 - reveal for alpha
+  vec3 average_color = accum.rgb / max(accum.a, 1e-5);
+  outColor = vec4(average_color, 1.0 - reveal);
 }
